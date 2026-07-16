@@ -465,7 +465,27 @@ In addition to unit tests, the pipeline also verifies that all example uploads c
 
 For example upload tests, the CI uses the image built in the Build Image step. It then runs the Docker container and starts up the application to confirm that it functions correctly. This approach ensures that if the pipeline passes, the app is more likely to run smoothly in a Dockerized environment on a server, not just locally.
 
-If you need to disable tests for specific plugins, update the **PLUGIN_TESTS_PLUGINS_TO_SKIP** variable in [.github/workflows/docker-publish.yml](./.github/workflows/docker-publish.yml#L21) by adding the plugin names to the existing list.
+If you need to disable tests for specific plugins, update the
+**PLUGIN_TESTS_PLUGINS_TO_SKIP** scalar in
+[.github/workflows/docker-publish.yml](./.github/workflows/docker-publish.yml#L21).
+Use comma-separated selectors as the canonical form, for example
+`"nomad-measurements,nomad-pvcomb"`. Arbitrary whitespace separators remain
+accepted for compatibility with earlier template documentation. The workflow
+passes the scalar unchanged to both plugin-unit and example-upload tests.
+
+A selector can be an exact, case-sensitive installed plugin module name or a
+distribution name normalized according to Python packaging rules. Distribution
+selectors can match multiple installed modules. Missing distribution metadata
+does not create a module-name alias. Unknown selectors fail the test stage after
+reporting the requested values and any successful installed matches; they are
+never reported as actually skipped. Each stage reports requested selectors,
+installed matches, and identities actually skipped separately before plugin test
+diagnostics.
+
+The test tools are explicitly locked in the `test` dependency group. Reproduce
+the CI environment with `uv sync --frozen --extra plugins --group test`, then run
+the selector drift tests with
+`uv run --frozen --extra plugins --group test pytest tests/test_plugin_skip.py`.
 
 ## Set Up Regular Package Updates with Dependabot
 

@@ -38,6 +38,15 @@ cpu-action = []
 
 dev = ["nomad-lab[infrastructure, dev]==1.4.3"]
 
+[dependency-groups]
+test = [
+  # Release-candidate pin. Replace this immutable commit with
+  # nomad-plugin-tests==0.3.0 after the upstream package release is published.
+  "nomad-plugin-tests @ git+https://github.com/QEDeD/nomad-plugin-tests.git@0286ed218ae9b90f02f9c7d153fc2f1415622672",
+  "pytest>=8.3.5,<10",
+  "pyyaml>=6.0",
+]
+
 [tool.uv]
 extra-index-url = [
   "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple",
